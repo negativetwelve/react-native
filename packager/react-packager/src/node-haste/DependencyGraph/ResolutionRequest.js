@@ -352,7 +352,11 @@ class ResolutionRequest {
             return this._resolveFileOrDir(fromModule, absPath);
           }
 
-          const searchQueue = [];
+          const rootDir = process.cwd();
+          const searchQueue = [
+            path.join(rootDir, realModuleName),
+            path.join(rootDir, 'libraries', realModuleName),
+          ];
           for (let currDir = path.dirname(fromModule.path);
                currDir !== realPath.parse(fromModule.path).root;
                currDir = path.dirname(currDir)) {
@@ -428,6 +432,8 @@ class ResolutionRequest {
       } else if (this._platform != null &&
                  this._fastfs.fileExists(potentialModulePath + '.' + this._platform + '.js')) {
         file = potentialModulePath + '.' + this._platform + '.js';
+      } else if (this._fastfs.fileExists(potentialModulePath + '.mobile.js')) {
+        file = potentialModulePath + '.mobile.js';
       } else if (this._preferNativePlatform &&
                  this._fastfs.fileExists(potentialModulePath + '.native.js')) {
         file = potentialModulePath + '.native.js';
